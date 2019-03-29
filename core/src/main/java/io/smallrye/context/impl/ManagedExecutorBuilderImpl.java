@@ -17,10 +17,11 @@ public class ManagedExecutorBuilderImpl implements ManagedExecutor.Builder {
     public ManagedExecutorBuilderImpl(SmallRyeContextManager manager) {
         this.manager = manager;
         // initiate with default values
-        this.propagated = DefaultValues.INSTANCE.getExecutorPropagated();
-        this.cleared = DefaultValues.INSTANCE.getExecutorCleared();
-        this.maxAsync = DefaultValues.INSTANCE.getExecutorAsync();
-        this.maxQueued = DefaultValues.INSTANCE.getExecutorQueue();
+        DefaultValues defaults = DefaultValues.getDefaults(Thread.currentThread().getContextClassLoader());
+        this.propagated = defaults.getExecutorPropagated();
+        this.cleared = defaults.getExecutorCleared();
+        this.maxAsync = defaults.getExecutorAsync();
+        this.maxQueued = defaults.getExecutorQueue();
     }
 
     @Override

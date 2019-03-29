@@ -5,7 +5,10 @@ import io.smallrye.context.api.ManagedExecutorConfig;
 
 import org.eclipse.microprofile.config.Config;
 import org.eclipse.microprofile.config.ConfigProvider;
+import org.eclipse.microprofile.config.spi.ConfigSource;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 /**
@@ -16,17 +19,16 @@ import java.util.NoSuchElementException;
  */
 public class DefaultValues {
 
-    // single instance
-    public static final DefaultValues INSTANCE = new DefaultValues();
+    private static Map<ClassLoader, DefaultValues> mapOfDefaults = new HashMap<>();
 
     // constants defined by spec for MP Config
-    private final String EXEC_ASYNC = "ManagedExecutor/maxAsync";
-    private final String EXEC_QUEUE = "ManagedExecutor/maxQueued";
-    private final String EXEC_PROPAGATED = "ManagedExecutor/propagated";
-    private final String EXEC_CLEARED = "ManagedExecutor/cleared";
-    private final String THREAD_CLEARED = "ThreadContext/cleared";
-    private final String THREAD_PROPAGATED = "ThreadContext/propagated";
-    private final String THREAD_UNCHANGED = "ThreadContext/unchanged";
+    private static final String EXEC_ASYNC = "ManagedExecutor/maxAsync";
+    private static final String EXEC_QUEUE = "ManagedExecutor/maxQueued";
+    private static final String EXEC_PROPAGATED = "ManagedExecutor/propagated";
+    private static final String EXEC_CLEARED = "ManagedExecutor/cleared";
+    private static final String THREAD_CLEARED = "ThreadContext/cleared";
+    private static final String THREAD_PROPAGATED = "ThreadContext/propagated";
+    private static final String THREAD_UNCHANGED = "ThreadContext/unchanged";
 
     // actual defaults
     private String[] executorPropagated;
@@ -60,6 +62,15 @@ public class DefaultValues {
         } catch (NoSuchElementException e) {
             return originalValue;
         }
+    }
+
+    public static DefaultValues getDefaults(ClassLoader cl) {
+        DefaultValues defaultValues = mapOfDefaults.get(cl);
+        if (defaultValues == null) {
+            defaultValues = new DefaultValues();
+            mapOfDefaults.put(cl, defaultValues);
+        }
+        return defaultValues;
     }
 
     public String[] getExecutorPropagated() {
